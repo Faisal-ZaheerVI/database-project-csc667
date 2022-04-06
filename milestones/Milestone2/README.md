@@ -1,3 +1,7 @@
+# ERD Modifications
+
+1. 
+
 # Milestone 2: The Relational Model 
 
 The goal of this milestone is to create a complete technical document that will define in detail the logical 
