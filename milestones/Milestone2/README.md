@@ -1,6 +1,11 @@
 # ERD Modifications
 
-1. 
+1. Added new strong entities: Major, Minor, Building, Visitor, Store, Product, Wellness_Center, Janitor.
+2. Added new weak entities: College Major, College Minor, Campus, Room, Office, Class.
+3. Added new recursive relational entity Supervisors (recursive with Employee).
+4. Added new relational entities: Student Major, Student Minor, Visiting, Assigned_Cleaning, Activities.
+5. Removed Faculty_Address (because Faculty is an Employee with Employee_Address).
+6. Changed numeric attributes to VARCHAR with varying lengths, including ssn for Employee, acct_number and routing for Bank_Account, card_number for Credit_Card, phone for Account.
 
 # Milestone 2: The Relational Model 
 
