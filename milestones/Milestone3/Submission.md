@@ -4,6 +4,12 @@
 **Name**: Faisal Zaheer  
 **Student ID#**: 917567058
 
+## Milestone 3 Files Changes
+- Modified inserts.sql
+- Modified triggers.sql
+- Modified EER.mwb (Added campus_name field to Campus table)
+- Modified databasemodel.sql
+
 ## Discord Server Link
 https://discord.gg/Y4w6C2RG5E  
 
@@ -12,41 +18,41 @@ https://replit.com/join/zkwirqlwbk-faisal-zaheervi
 
 ## Commands
 
-1. /course_students <Course_code>
+1. *course_students <Course_code>
 
-2. /drop_teacherless_enrollment
+2. *drop_teacherless_enrollment
 
-3. /students_major <Major_name>
+3. *students_major <Major_name>
 
-4. /insert_faculty <Employee_name> <Department_name>
+4. *insert_faculty <Employee_name> + <Department_name>
 
-5. /college_visitors <College_name>
+5. *college_visitors <College_name>
 
-6. /courses_in_building <Building_name>
+6. *courses_in_building <Building_name>
 
-7. /full_time_students_count
+7. *full_time_students_count
 
-8. /assign_teacher_to_faculty <Ssn>
+8. *assign_teacher_to_faculty \<ssn>
 
-9. /sf_colleges
+9. *sf_colleges
 
-10. /num_course_teachers
+10. *num_course_teachers
 
-11. /avg_grader_salary
+11. *avg_grader_salary
 
-12. /supervisors
+12. *supervisors
 
-13. /avg_teacher_salary
+13. *avg_teacher_salary
 
-14. /multi_major_students
+14. *multi_major_students
 
-15. /num_campus_classes
+15. *num_campus_classes
 
-16. /college_stores <College_name>
+16. *college_stores <College_name>
 
-17. /course_graders <Course_code>
+17. *course_graders <Course_code>
 
-18. /available_courses
+18. *available_courses
 
 ## Business Rules
 1. Find the number of Students that are taking a specific Course during the current semester.

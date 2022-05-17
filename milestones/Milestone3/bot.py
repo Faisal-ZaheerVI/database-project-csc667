@@ -13,8 +13,8 @@ import database as db
 # environment variables
 token = os.environ['DISCORD_TOKEN']
 server = os.environ['DISCORD_GUILD']
-server_id = os.environ['SERVER_ID']  # optional
-channel_id = os.environ['CHANNEL_ID']  # optional
+# server_id = os.environ['SERVER_ID']  # optional
+# channel_id = os.environ['CHANNEL_ID']  # optional
 
 # database connection
 # secret keys related to your database must be updated. Otherwise, it won't work
@@ -49,6 +49,7 @@ async def on_message(message):
     else:
         # A message was send by the user.
         msg = message.content.lower()
+        response = db.getResponse(msg)
         if "milestone3" in msg:
             response = "I am alive. Signed: 'your bot'"
     if response:
