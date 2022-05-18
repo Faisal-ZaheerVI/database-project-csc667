@@ -93,22 +93,31 @@ def getResponse(msg):
       elif len(data) > 3:
         employee_name = ''
         department_name = ''
+        college_name = ''
         found = False # Determines when to add to Employee or Department name
+        found2 = False
         # Separates and assigns Employee name and Department name based on '+' separator
         for x in range(1, len(data)):
-          if data[x] == '+':
+          if data[x] == '+' and found == False:
             found = True
           elif found == False:
             if employee_name == '':
               employee_name = data[x]
             else:
               employee_name = employee_name + ' ' + data[x]
-          elif found == True:
-            if department_name == '':
+          elif found == True and found2 == False:
+            if data[x] == '+' and found2 == False:
+              found2 = True
+            elif department_name == '':
               department_name = data[x]
             else:
               department_name = department_name + ' ' + data[x]
-        response = insert_faculty(employee_name, department_name)
+          elif found == True and found2 == True:
+            if college_name == '':
+              college_name = data[x]
+            else:
+              college_name = college_name + ' ' + data[x]
+        response = insert_faculty(employee_name, department_name, college_name)
 
     #   5. *college_visitors <College_name>
     elif "*college_visitors" in command:
@@ -448,8 +457,8 @@ def students_major(major_name):
     return output
 
 #   4. Update automatically the number of Faculty members in a Department every time a Faculty Member is inserted into the database.
-#   4. *insert_faculty <Employee_name> + <Department_name>
-def insert_faculty(employee_name, department_name):
+#   4. *insert_faculty <Employee_name> + <Department_name> + <College_name>
+def insert_faculty(employee_name, department_name, college_name):
   try:
     conn = connect()
     rows = []
@@ -458,8 +467,12 @@ def insert_faculty(employee_name, department_name):
         cursor = conn.cursor()
         employee = employee_name.lower()
         department = department_name.lower()
-        query = """SET @departmentId = (SELECT department_id FROM Department WHERE department_name = %s);"""
-        cursor.execute(query, department)
+        college = college_name.lower()
+        print(employee)
+        print(department)
+        print(college)
+        query = """SET @departmentId = (SELECT Department.department_id FROM Department JOIN College ON College.college_id = Department.college WHERE Department.department_name = %s AND College.college_name = %s);"""
+        cursor.execute(query, (department, college))
         query = """SET @length = LENGTH(%s);"""
         cursor.execute(query, employee)
         query = """SET @position = POSITION(" " in %s) + 1;"""
@@ -470,7 +483,7 @@ def insert_faculty(employee_name, department_name):
         cursor.execute(query, employee)
         query = """SET @username = LOWER(CONCAT(@initial, REPLACE(@lname, ' ', '')));"""
         cursor.execute(query)
-        query = """SET @position1 = POSITION(" " in %s) - 1"""
+        query = """SET @position1 = POSITION(" " in %s) - 1;"""
         cursor.execute(query, employee)
         query = """SET @newPassword = UPPER(CONCAT('PASSWORD_', SUBSTRING(%s, 1, @position1)));"""
         cursor.execute(query, employee)
@@ -491,7 +504,7 @@ def insert_faculty(employee_name, department_name):
         query = """INSERT INTO Faculty_Member (ssn, department, account, name, gender, age, salary) SELECT ssn, @departmentId, @accountId, name, gender, age, salary FROM Employee WHERE Employee.name = %s;"""
         cursor.execute(query, employee)
         conn.commit()
-        query = """SELECT Faculty_Member.faculty_id AS "Faculty ID", Faculty_Member.name AS "Name", Department.department_name AS "Department", Faculty_Member.account AS "Account ID", Faculty_Member.gender AS "Gender", Faculty_Member.Age AS "Age", Faculty_Member.salary AS "Salary" FROM Faculty_Member JOIN Department ON Department.department_id = Faculty_Member.department WHERE Faculty_Member.name = %s;"""
+        query = """SELECT Faculty_Member.faculty_id AS "Faculty ID", Faculty_Member.name AS "Name", Department.department_name AS "Department" FROM Faculty_Member JOIN Department ON Department.department_id = Faculty_Member.department WHERE Faculty_Member.name = %s;"""
         cursor.execute(query, employee)
         data = cursor.fetchall()
         if data:
@@ -1006,20 +1019,22 @@ def view_college_campus():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['Campus', 'College']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT Campus.campus_name AS "Campus", College.college_name AS "College" FROM Campus JOIN College ON College.college_id = Campus.college ORDER BY College.college_name ASC, Campus.campus_name ASC;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['Campus']
+                column2 = queryData['College']
                 row.append(column1)
+                row.append(column2)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Campuses'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted
@@ -1034,20 +1049,22 @@ def view_buildings():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['Building', 'Campus']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT Building.building_name AS "Building", Campus.campus_name AS "Campus" FROM Building JOIN Campus ON Campus.campus_id = Building.campus ORDER BY Campus.campus_name ASC, Building.building_name ASC;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['Building']
+                column2 = queryData['Campus']
                 row.append(column1)
+                row.append(column2)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Buildings'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted
@@ -1062,20 +1079,24 @@ def view_departments():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['Department', 'Faculty Count', 'College']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT d_name AS "Department", d_count AS "Faculty Count", c_name AS "College" FROM (SELECT Department.department_name AS d_name, Department.department_id AS d_id, (SELECT COUNT(*) FROM Faculty_Member WHERE Faculty_Member.department = d_id) AS d_count,  College.college_name AS c_name FROM Department JOIN College ON College.college_id = Department.college) AS subquery ORDER BY c_name ASC, d_name ASC;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['Department']
+                column2 = queryData['Faculty Count']
+                column3 = queryData['College']
                 row.append(column1)
+                row.append(column2)
+                row.append(column3)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Departments'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted
@@ -1090,20 +1111,24 @@ def view_employees():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['SSN', 'Employee', 'Role']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT Employee.ssn AS "SSN", Employee.name AS "Employee", IF(Employee.is_supervisor, "Supervisor", "Employee") AS "Role" FROM Employee ORDER BY Employee.ssn ASC;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['SSN']
+                column2 = queryData['Employee']
+                column3 = queryData['Role']
                 row.append(column1)
+                row.append(column2)
+                row.append(column3)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Employees'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted
@@ -1118,20 +1143,24 @@ def view_faculty():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['SSN', 'Faculty Member', 'Department']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT Faculty_Member.ssn AS "SSN", Faculty_Member.name AS "Faculty Member", Department.department_name AS "Department" FROM Faculty_Member JOIN Department on Department.department_id = Faculty_Member.department ORDER BY Faculty_Member.name ASC;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['SSN']
+                column2 = queryData['Faculty Member']
+                column3 = queryData['Department']
                 row.append(column1)
+                row.append(column2)
+                row.append(column3)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Faculty Members'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted
@@ -1146,20 +1175,22 @@ def view_courses():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['Course', 'Title']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT DISTINCT Course.code AS "Course", Course.title AS "Title" FROM Course ORDER BY Course.code ASC;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['Course']
+                column2 = queryData['Title']
                 row.append(column1)
+                row.append(column2)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Courses'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted
@@ -1174,20 +1205,22 @@ def view_students():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['ID', 'Student']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT Student.student_id AS "ID", Student.name AS "Student" FROM Student;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['ID']
+                column2 = queryData['Student']
                 row.append(column1)
+                row.append(column2)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Students'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted
@@ -1202,20 +1235,21 @@ def view_majors():
   try:
     conn = connect()
     rows = []
-    headers = ['']
+    headers = ['Major']
     if conn:
         cursor = conn.cursor()
-        query = """"""
+        query = """SELECT Major.major_name AS "Major" FROM Major 
+ORDER BY Major.major_name ASC;"""
         cursor.execute(query)
         data = cursor.fetchall()
         if data:
             for queryData in data:
                 row = []
-                column1 = queryData['']
+                column1 = queryData['Major']
                 row.append(column1)
                 rows.append(row)
         output = format_data(headers, rows)
-        output.title = ''
+        output.title = 'All College Majors'
         conn.close()
         formatted = "`" + output.get_string() + "`"
         return formatted

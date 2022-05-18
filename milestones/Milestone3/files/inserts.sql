@@ -13,7 +13,9 @@ INSERT INTO College (college_id, college_name) VALUES (1, "San Francisco State U
 
 -- Department table inserts
 INSERT INTO Department (college, department_name) VALUES (1, "Computer Science"), 
-(1, "Mathematics"), (2, "Computer Science"),  (3, "Biology");
+(1, "Mathematics"), (1, "Science"), (1, "Engineering"), (2, "Computer Science"),  
+(2, "Mathematics"), (2, "Science"), (2, "Engineering"),
+(3, "Computer Science"),  (3, "Mathematics"), (3, "Science"), (3, "Engineering");
 
 -- Employee table inserts
 INSERT INTO Employee (ssn, is_supervisor, name, gender, age, salary, dob) VALUES ("123-45-6789", 0, "Joe Schmuck", "MALE", 40, 100000, '1982-01-16'),

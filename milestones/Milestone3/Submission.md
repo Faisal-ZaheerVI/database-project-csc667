@@ -5,10 +5,10 @@
 **Student ID#**: 917567058
 
 ## Milestone 3 Files Changes
-- Modified inserts.sql
-- Modified triggers.sql
+- Modified inserts.sql (Added more records to several tables)
+- Modified triggers.sql (Added command required and other triggers/procedures/functions)
 - Modified EER.mwb (Added campus_name field to Campus table)
-- Modified databasemodel.sql
+- Modified databasemodel.sql (Forward engineered from newly modified DB model)
 
 ## Discord Server Link
 https://discord.gg/Y4w6C2RG5E  
@@ -24,7 +24,7 @@ https://replit.com/join/zkwirqlwbk-faisal-zaheervi
 
 3. *students_major <Major_name>
 
-4. *insert_faculty <Employee_name> + <Department_name>
+4. *insert_faculty <Employee_name> + <Department_name> + <College_name>
 
 5. *college_visitors <College_name>
 
@@ -90,3 +90,22 @@ https://replit.com/join/zkwirqlwbk-faisal-zaheervi
 17. Create a procedure that returns the number of Graders for a particular course. (Course code passed in as parameter)
 
 18. Find the number of courses this semester that have less than 30 Students currently enrolled in it.
+
+### Supplemental Commands
+(To help with retrieving existing sample data from database to test required commands)
+
+1. ***view_college_campus** (View all Colleges and their Campuses)
+
+2. ***view_buildings** (Views all Buildings and relevant info)
+
+3. ***view_departments** (Views all Departments and relevant info)
+
+4. ***view_employees** (Views all Employees and relevant info)
+
+5. ***view_faculty** (Views all Faculty Members and relevant info)
+
+6. ***view_courses** (Views all Courses and relevant info)
+
+7. ***view_students** (Views all Students and relevant info)
+
+8. ***view_majors** (Views all Majors and relevant info) 
